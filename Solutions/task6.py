@@ -1,6 +1,7 @@
-''' 
-Update the PlayGame method to allow the user to enter the word “QUIT” instead of an expression.
-Ensure that the code does not decrement the score on that turn.
+'''
+Let the user move the targets back to the right by 1 space instead of 
+entering an expression. The Score should be reduced by 2. The list should maintain its
+standard length. The start of the list should be repopulated with -1.
 '''
 import re
 import random
@@ -33,26 +34,35 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     GameOver = False
     while not GameOver:
         DisplayState(Targets, NumbersAllowed, Score)
-        UserInput = input("Enter an expression: ")
+        UserInput = input("Enter an expression or type MOVE to move targets back: ")
         print()
-        if CheckIfUserInputValid(UserInput):
+        # Task 6.1 begin change
+        Move = False
+        if UserInput.upper() == "MOVE":
+            Move = True
+            Score -= 1
+            Targets = MoveTargetsBack(Targets)
+        elif CheckIfUserInputValid(UserInput):
             UserInputInRPN = ConvertToRPN(UserInput)
             if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
                 IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
                 if IsTarget:
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
                     NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
-        # Task 1 begin change
-        elif UserInput.upper() == "QUIT":
-            break
-        # Task 1 end change
         Score -= 1
         if Targets[0] != -1:
             GameOver = True
         else:
-            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)        
+            if not Move:
+                Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)
+        # Task 6.1 end change (MoveTargetsBack)      
     print("Game over!")
     DisplayScore(Score)
+
+def MoveTargetsBack(Targets):
+    Targets.pop()
+    Targets.insert(0, -1)
+    return Targets
 
 def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)

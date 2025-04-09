@@ -1,7 +1,3 @@
-''' 
-Update the PlayGame method to allow the user to enter the word “QUIT” instead of an expression.
-Ensure that the code does not decrement the score on that turn.
-'''
 import re
 import random
 import math
@@ -38,14 +34,12 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
         if CheckIfUserInputValid(UserInput):
             UserInputInRPN = ConvertToRPN(UserInput)
             if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
-                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+                # Task 5.1 begin change
+                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score, UserInput)
+                # Task 5.1 end change (Check if evaluation is a target)
                 if IsTarget:
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
                     NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
-        # Task 1 begin change
-        elif UserInput.upper() == "QUIT":
-            break
-        # Task 1 end change
         Score -= 1
         if Targets[0] != -1:
             GameOver = True
@@ -54,16 +48,25 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     print("Game over!")
     DisplayScore(Score)
 
-def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
+def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score, UserInput):
+    # Task 5.1 begin change
+    bonus = 0
+    # Kind of stole this from ConvertToRPN - important to know the code!
+    Position = 0
+    while Position < len(UserInput):
+        Operand, Position = GetNumberFromUserInput(UserInput, Position)
+        bonus += 2
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
         for Count in range(0, len(Targets)):
-            # Good for avoiding index errors
             if Targets[Count] == UserInputEvaluation:
                 Score += 2
                 Targets[Count] = -1
-                UserInputEvaluationIsATarget = True        
+                UserInputEvaluationIsATarget = True
+    if UserInputEvaluationIsATarget:
+        Score += bonus
+    # Task 5.1 end change
     return UserInputEvaluationIsATarget, Score
     
 def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed):
