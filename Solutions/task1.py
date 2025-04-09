@@ -38,6 +38,10 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
                 if IsTarget:
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
                     NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+        # Task 1 begin change
+        elif UserInput.upper() == "QUIT":
+            break
+        # Task 1 end change
         Score -= 1
         if Targets[0] != -1:
             GameOver = True

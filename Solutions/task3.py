@@ -1,3 +1,7 @@
+# Modify the UpdateTargets method to simplify how the list is interacted just 
+# using start and end indices rather than iterating through it. 
+# Ensure that the functionality of the method does not change.
+
 import re
 import random
 import math
@@ -67,14 +71,14 @@ def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed):
     return NumbersAllowed
 
 def UpdateTargets(Targets, TrainingGame, MaxTarget):
-    for Count in range (0, len(Targets) - 1):
-        Targets[Count] = Targets[Count + 1]
-    Targets.pop()
+    # Task 3.1 begin change
+    newTargets = Targets[1:]
     if TrainingGame:
-        Targets.append(Targets[-1])
+        newTargets.append(Targets[-1])
     else:
-        Targets.append(GetTarget(MaxTarget))
-    return Targets
+        newTargets.append(GetTarget(MaxTarget))
+    # Task 1.1 end change
+    return newTargets
 
 def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
     Temp = []

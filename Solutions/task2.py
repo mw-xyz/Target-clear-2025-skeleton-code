@@ -1,11 +1,3 @@
-# Format: Thought process, edited code, completed code.
-# If you want to run, delete the multi-line commented code
-
-"""Thought Process"""
-
-"""
-Firstly, """
-
 import re
 import random
 import math
@@ -46,6 +38,14 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
                 if IsTarget:
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
                     NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+            # Task 2.1.1 begin change
+                else:
+                    print("⚠️ Expression entered does not evaluate to a target in targets list.\n")
+            else:
+                print("Only numbers listed can be used in the expression.")
+        else:
+            print("Expression is not valid infix notation")
+        # Task 2.1.1 end change (see CheckIfUserInputValid)
         Score -= 1
         if Targets[0] != -1:
             GameOver = True
@@ -59,6 +59,7 @@ def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
         for Count in range(0, len(Targets)):
+            # Good for avoiding index errors
             if Targets[Count] == UserInputEvaluation:
                 Score += 2
                 Targets[Count] = -1
@@ -85,6 +86,7 @@ def UpdateTargets(Targets, TrainingGame, MaxTarget):
 
 def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
     Temp = []
+    # Task 2.1.1 begin change
     for Item in NumbersAllowed:
         Temp.append(Item)
     for Item in UserInputInRPN:
@@ -92,8 +94,9 @@ def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNu
             if int(Item) in Temp:
                 Temp.remove(int(Item))
             else:
-                return False            
+                return False  
     return True
+    # Task 2.1.1 end change
 
 def CheckValidNumber(Item, MaxNumber):
     if re.search("^[0-9]+$", Item) is not None:
@@ -137,6 +140,7 @@ def ConvertToRPN(UserInput):
     Operand, Position = GetNumberFromUserInput(UserInput, Position)
     UserInputInRPN = []
     UserInputInRPN.append(str(Operand))
+    # This shouldn't happen
     Operators.append(UserInput[Position - 1])
     while Position < len(UserInput):
         Operand, Position = GetNumberFromUserInput(UserInput, Position)
@@ -174,7 +178,13 @@ def EvaluateRPN(UserInputInRPN):
         elif UserInputInRPN[0] == "*":
             Result = Num1 * Num2
         elif UserInputInRPN[0] == "/":
-            Result = Num1 / Num2
+            # Task 2.1.4 begin change
+            try:
+                Result = Num1 / Num2
+            except ZeroDivisionError:
+                print("Cannot divide by zero")
+                return -1
+            # Task 2.1.4 end change
         UserInputInRPN.pop(0)
         S.append(str(Result))       
     if float(S[0]) - math.floor(float(S[0])) == 0.0:
@@ -186,6 +196,7 @@ def GetNumberFromUserInput(UserInput, Position):
     Number = ""
     MoreDigits = True
     while MoreDigits:
+        # if UserInput[Position].isdigit()
         if not(re.search("[0-9]", str(UserInput[Position])) is None):
             Number += UserInput[Position]
         else:
