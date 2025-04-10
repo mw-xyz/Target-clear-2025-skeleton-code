@@ -19,8 +19,11 @@ def Main():
     else:
         MaxNumber = 10
         MaxTarget = 50
-        Targets = CreateTargets(MaxNumberOfTargets, MaxTarget)        
-    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+        Targets = CreateTargets(MaxNumberOfTargets, MaxTarget)  
+    # 7.1 start change      
+    preferredNo = ""
+    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber, preferredNo)
+    # 7.1 end change (PlayGame)
     PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber)
     input()
     
@@ -33,11 +36,15 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
         print()
         if CheckIfUserInputValid(UserInput):
             UserInputInRPN = ConvertToRPN(UserInput)
+            lst2 = UserInputInRPN.copy()
             if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
                 IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
                 if IsTarget:
+                    # 7.1 start change
+                    preferredNumber = SelectValueFromTarget(lst2)
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
-                    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+                    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber, preferredNumber)
+                    # 7.1 end change (SelectValueFromTarget)
         Score -= 1
         if Targets[0] != -1:
             GameOver = True
@@ -46,11 +53,27 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     print("Game over!")
     DisplayScore(Score)
 
+# 7.1 start change
+def SelectValueFromTarget(UserInputInRPN):
+    val = EvaluateRPN(UserInputInRPN)
+    strval = str(val)
+    lst = [int(x) for x in strval]
+    lst.append(val)
+    print(f"You successfully hit target: {val}.")
+    print("You have the option to add one of the following values into the selection of numbers to hit targets with:")
+    print(lst)
+    choice = int(input("Select ONE value from the options above and type it here to add, or anything else to not add a number: "))
+    if choice in lst:
+        return choice
+    return ""
+# 7.1 end change (FillNumbers)
+
 def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
         for Count in range(0, len(Targets)):
+            # Good for avoiding index errors
             if Targets[Count] == UserInputEvaluation:
                 Score += 2
                 Targets[Count] = -1
@@ -210,12 +233,16 @@ def CreateTargets(SizeOfTargets, MaxTarget):
         Targets.append(GetTarget(MaxTarget))
     return Targets
     
-def FillNumbers(NumbersAllowed, TrainingGame, MaxNumber):
+def FillNumbers(NumbersAllowed, TrainingGame, MaxNumber, preferredNo):
     if TrainingGame:
         return [2, 3, 2, 8, 512]
     else:
-        while len(NumbersAllowed) < 5:
-            NumbersAllowed.append(GetNumber(MaxNumber))      
+        # Task 7.1 start change
+        if preferredNo != "":
+                NumbersAllowed.append(preferredNo)
+        for i in range(0,5):
+            NumbersAllowed.append(GetNumber(MaxNumber))  
+        # Task 7.1 end change    
         return NumbersAllowed
 
 if __name__ == "__main__":

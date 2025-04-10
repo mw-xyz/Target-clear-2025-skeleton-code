@@ -28,13 +28,20 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     Score = 0
     GameOver = False
     while not GameOver:
+        # Task 8.1 start change
+        challengeMode = False
+        probs = random.randint(0,100)
+        if probs < 25:
+            challengeMode = True
+            print("CHALLENGE MODE! Use ALL numbers to score 10 POINTS!\nIf you DON'T, you're a LOSER and will LOSE 5 POINTS!")
         DisplayState(Targets, NumbersAllowed, Score)
         UserInput = input("Enter an expression: ")
         print()
         if CheckIfUserInputValid(UserInput):
             UserInputInRPN = ConvertToRPN(UserInput)
             if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
-                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score, challengeMode, NumbersAllowed)
+                # Task 8.1 end change (CheckIfUserInputEvaluationIsATarget)
                 if IsTarget:
                     NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
                     NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
@@ -46,7 +53,8 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     print("Game over!")
     DisplayScore(Score)
 
-def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
+def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score, challengeMode, NumbersAllowed):
+    list2 = UserInputInRPN.copy()
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
@@ -54,7 +62,29 @@ def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
             if Targets[Count] == UserInputEvaluation:
                 Score += 2
                 Targets[Count] = -1
-                UserInputEvaluationIsATarget = True        
+                UserInputEvaluationIsATarget = True
+    # Task 8.1 start change
+    if challengeMode:
+        operands = []
+        for x in list2:
+            try:
+                operands.append(int(x))
+            except ValueError:
+                continue
+        operands.sort()
+        NumbersAllowed.sort()
+        allMatching = True
+        if allMatching:
+            for i in range(0, len(NumbersAllowed)-1):
+                try:
+                    allMatching = operands[i] == NumbersAllowed[i]
+                except IndexError:
+                    allMatching = False
+        if allMatching:
+            Score += 10
+        else:
+            Score -= 5         
+    # Task 8.1 end change        
     return UserInputEvaluationIsATarget, Score
     
 def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed):

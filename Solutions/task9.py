@@ -27,22 +27,29 @@ def Main():
 def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     Score = 0
     GameOver = False
+    numberChoice = 9999
     while not GameOver:
-        DisplayState(Targets, NumbersAllowed, Score)
-        UserInput = input("Enter an expression: ")
-        print()
-        if CheckIfUserInputValid(UserInput):
-            UserInputInRPN = ConvertToRPN(UserInput)
-            if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
-                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
-                if IsTarget:
-                    NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
-                    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
-        Score -= 1
-        if Targets[0] != -1:
-            GameOver = True
+        DisplayState(Targets, NumbersAllowed, Score, numberChoice)
+        freezeChoice = input("Type f to use freeze mode, or anything else to continue as normal: ").lower()
+        if freezeChoice == "f":
+            numberChoice = int(input("Type the POSITION that you want to freeze: "))
+            numberChoice -= 1
+            DisplayState(Targets, NumbersAllowed, Score, numberChoice)
         else:
-            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)        
+            UserInput = input("Enter an expression: ")
+            print()
+            if CheckIfUserInputValid(UserInput):
+                UserInputInRPN = ConvertToRPN(UserInput)
+                if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+                    IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+                    if IsTarget:
+                        NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
+                        NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+            Score -= 1
+            if Targets[0] != -1:
+                GameOver = True
+            else:
+                Targets = UpdateTargets(Targets, TrainingGame, MaxTarget, numberChoice)        
     print("Game over!")
     DisplayScore(Score)
 
@@ -65,9 +72,17 @@ def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed):
                 NumbersAllowed.remove(int(Item))
     return NumbersAllowed
 
-def UpdateTargets(Targets, TrainingGame, MaxTarget):
+def UpdateTargets(Targets, TrainingGame, MaxTarget, position):
     for Count in range (0, len(Targets) - 1):
-        Targets[Count] = Targets[Count + 1]
+        # Task 9.1 begin change
+        if Count != position:
+            Targets[Count] = Targets[Count + 1]
+        else:
+            a = Targets[Count+1]
+            b = Targets[Count-1]
+            Targets[Count+1] = b
+            Targets[Count-1] = a
+        # Task 9.1 end change (DisplayState)
     Targets.pop()
     if TrainingGame:
         Targets.append(Targets[-1])
@@ -93,11 +108,13 @@ def CheckValidNumber(Item, MaxNumber):
         if ItemAsInteger > 0 and ItemAsInteger <= MaxNumber:
             return True            
     return False
-    
-def DisplayState(Targets, NumbersAllowed, Score):
-    DisplayTargets(Targets)
+
+# Task 9.1 begin change    
+def DisplayState(Targets, NumbersAllowed, Score, numberChoice):
+    DisplayTargets(Targets, numberChoice)
     DisplayNumbersAllowed(NumbersAllowed)
     DisplayScore(Score)    
+# Task 9.1 end change (DisplayTargets)
 
 def DisplayScore(Score):
     print("Current score: " + str(Score))
@@ -110,14 +127,18 @@ def DisplayNumbersAllowed(NumbersAllowed):
         print(str(N) + "  ", end = '')
     print()
     print()
-    
-def DisplayTargets(Targets):
+
+# Task 9.1 begin change
+def DisplayTargets(Targets, numberChoice):
     print("|", end = '')
-    for T in Targets:
-        if T == -1:
+    for T in range (0, len(Targets) - 1):
+        if Targets[T] == -1:
             print(" ", end = '')
+        elif T == numberChoice:
+            print(f"<{Targets[T]}>", end = '')
+    # Task 9.1 end change
         else:
-            print(T, end = '')           
+            print(Targets[T], end = '')           
         print("|", end = '')
     print()
     print()
