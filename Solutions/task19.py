@@ -202,26 +202,20 @@ def GetTarget(MaxTarget):
 def GetNumber(MaxNumber):
     return random.randint(1, MaxNumber)   
 
-# Task 18 start change
 def CreateTargets(SizeOfTargets, MaxTarget):
     Targets = []
     for Count in range(1, 6):
         Targets.append(-1)
     for Count in range(1, SizeOfTargets - 4):
-        newNum = GetTarget(MaxTarget)
-        if newNum not in Targets:
-            Targets.append(GetTarget(MaxTarget))
+        Targets.append(GetTarget(MaxTarget))
     return Targets
     
-# Task 18 start change
 def FillNumbers(NumbersAllowed, TrainingGame, MaxNumber):
     if TrainingGame:
         return [2, 3, 2, 8, 512]
     else:
         while len(NumbersAllowed) < 5:
-            newNum = GetNumber(MaxNumber)
-            if newNum not in NumbersAllowed:
-                NumbersAllowed.append(newNum)      
+            NumbersAllowed.append(GetNumber(MaxNumber))      
         return NumbersAllowed
 
 if __name__ == "__main__":
