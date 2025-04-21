@@ -60,6 +60,7 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     DisplayScore(Score)
 
 def MoveTargetsBack(Targets):
+    # Targets acts as a queue, so good to use indices rather than iteration
     Targets.pop()
     Targets.insert(0, -1)
     return Targets
@@ -148,7 +149,6 @@ def ConvertToRPN(UserInput):
     Operand, Position = GetNumberFromUserInput(UserInput, Position)
     UserInputInRPN = []
     UserInputInRPN.append(str(Operand))
-    # This shouldn't happen
     Operators.append(UserInput[Position - 1])
     while Position < len(UserInput):
         Operand, Position = GetNumberFromUserInput(UserInput, Position)
@@ -198,7 +198,6 @@ def GetNumberFromUserInput(UserInput, Position):
     Number = ""
     MoreDigits = True
     while MoreDigits:
-        # if UserInput[Position].isdigit()
         if not(re.search("[0-9]", str(UserInput[Position])) is None):
             Number += UserInput[Position]
         else:

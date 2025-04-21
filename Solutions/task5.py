@@ -56,6 +56,12 @@ def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score, UserInpu
     while Position < len(UserInput):
         Operand, Position = GetNumberFromUserInput(UserInput, Position)
         bonus += 2
+    # Less convoluted solution (knowing what the list looks like is important too):
+    """
+    for s inUserInputInRPN:
+        if s.isdigit():
+            BonusNumberCount+=1
+    """
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
@@ -141,7 +147,6 @@ def ConvertToRPN(UserInput):
     Operand, Position = GetNumberFromUserInput(UserInput, Position)
     UserInputInRPN = []
     UserInputInRPN.append(str(Operand))
-    # This shouldn't happen
     Operators.append(UserInput[Position - 1])
     while Position < len(UserInput):
         Operand, Position = GetNumberFromUserInput(UserInput, Position)
@@ -191,7 +196,6 @@ def GetNumberFromUserInput(UserInput, Position):
     Number = ""
     MoreDigits = True
     while MoreDigits:
-        # if UserInput[Position].isdigit()
         if not(re.search("[0-9]", str(UserInput[Position])) is None):
             Number += UserInput[Position]
         else:

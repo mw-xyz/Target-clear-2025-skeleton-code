@@ -1,3 +1,9 @@
+"""
+I didn't do this task as it was very similar to Task 11 but
+has not defined the scope at all (testing all combos gets big
+REALLY FAST.)
+"""
+
 import re
 import random
 import math
@@ -29,6 +35,10 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     GameOver = False
     while not GameOver:
         DisplayState(Targets, NumbersAllowed, Score)
+        hints = input("type y if you want hints, anything else to proceed as normal: ").lower()
+        if hints == "y":
+            for hint in GenerateEvaluations(NumbersAllowed, Targets):
+                print(hint)
         UserInput = input("Enter an expression: ")
         print()
         if CheckIfUserInputValid(UserInput):
@@ -46,6 +56,9 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
     print("Game over!")
     DisplayScore(Score)
 
+def GenerateEvaluations(NumbersAllowed, Targets):
+    operators = ["+", "-", "*", "/"]
+# Refer to Task 11 - GetRandomSuggestions
 def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluation = EvaluateRPN(UserInputInRPN)
     UserInputEvaluationIsATarget = False

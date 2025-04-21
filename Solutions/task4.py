@@ -1,3 +1,12 @@
+"""
+Introduce the functionality to have “Easy”, “Medium” and “Hard” levels in the 
+standard random game. Introduce a list of “Large” numbers [25, 50, 75, 100 ]. 
+The application should populate the NumbersAllowedlist.
+The functionality should produce a brand-new set of NumbersAllowed for 
+each turn even if the user expression does not evaluate to a target.
+This functionality is not applicable to a training game
+"""
+
 import re
 import random
 import math
@@ -77,7 +86,6 @@ def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
         for Count in range(0, len(Targets)):
-            # Good for avoiding index errors
             if Targets[Count] == UserInputEvaluation:
                 Score += 2
                 Targets[Count] = -1
@@ -114,6 +122,8 @@ def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNu
                 return False            
     return True
 
+# Was meant to make an exception for a large number?
+# MaxNumber is never modified??
 def CheckValidNumber(Item, MaxNumber):
     if re.search("^[0-9]+$", Item) is not None:
         ItemAsInteger = int(Item)
@@ -156,7 +166,6 @@ def ConvertToRPN(UserInput):
     Operand, Position = GetNumberFromUserInput(UserInput, Position)
     UserInputInRPN = []
     UserInputInRPN.append(str(Operand))
-    # This shouldn't happen
     Operators.append(UserInput[Position - 1])
     while Position < len(UserInput):
         Operand, Position = GetNumberFromUserInput(UserInput, Position)
@@ -206,7 +215,6 @@ def GetNumberFromUserInput(UserInput, Position):
     Number = ""
     MoreDigits = True
     while MoreDigits:
-        # if UserInput[Position].isdigit()
         if not(re.search("[0-9]", str(UserInput[Position])) is None):
             Number += UserInput[Position]
         else:

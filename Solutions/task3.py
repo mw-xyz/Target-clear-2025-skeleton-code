@@ -55,7 +55,6 @@ def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
     UserInputEvaluationIsATarget = False
     if UserInputEvaluation != -1:
         for Count in range(0, len(Targets)):
-            # Good for avoiding index errors
             if Targets[Count] == UserInputEvaluation:
                 Score += 2
                 Targets[Count] = -1
@@ -73,11 +72,11 @@ def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed):
 def UpdateTargets(Targets, TrainingGame, MaxTarget):
     # Task 3.1 begin change
     newTargets = Targets[1:]
+    # Task 3.1 end change
     if TrainingGame:
         newTargets.append(Targets[-1])
     else:
         newTargets.append(GetTarget(MaxTarget))
-    # Task 1.1 end change
     return newTargets
 
 def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
@@ -134,7 +133,6 @@ def ConvertToRPN(UserInput):
     Operand, Position = GetNumberFromUserInput(UserInput, Position)
     UserInputInRPN = []
     UserInputInRPN.append(str(Operand))
-    # This shouldn't happen
     Operators.append(UserInput[Position - 1])
     while Position < len(UserInput):
         Operand, Position = GetNumberFromUserInput(UserInput, Position)
@@ -184,7 +182,6 @@ def GetNumberFromUserInput(UserInput, Position):
     Number = ""
     MoreDigits = True
     while MoreDigits:
-        # if UserInput[Position].isdigit()
         if not(re.search("[0-9]", str(UserInput[Position])) is None):
             Number += UserInput[Position]
         else:
