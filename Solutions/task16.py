@@ -193,6 +193,7 @@ def GetNumberFromUserInput(UserInput, Position):
 
 def CheckIfUserInputValid(UserInput):
     # You could use regex but a stack was easier for me conceptually
+    # You could also use a counter which returns False when negative
     S = []
     for token in UserInput:
         if token == "(":
