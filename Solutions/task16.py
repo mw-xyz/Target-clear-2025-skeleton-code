@@ -192,6 +192,15 @@ def GetNumberFromUserInput(UserInput, Position):
         return int(Number), Position    
 
 def CheckIfUserInputValid(UserInput):
+    # You could use regex but a stack was easier for me conceptually
+    S = []
+    for token in UserInput:
+        if token == "(":
+            S.append("(")
+        elif token == ")":
+            if len(S) == 0:
+                return False
+            b = S.pop()
     if re.search("^([0-9]+[\\+\\-\\*\\/])+[0-9]+$", UserInput) is not None:
         return True
     else:
