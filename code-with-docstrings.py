@@ -1,5 +1,9 @@
 # If you ever want to understand code, use docstrings!
 # General note: 512/8+3*2-2
+# Docs are usable in the exam: 
+# https://docs.python.org/3.9/library/array.html?highlight=pop#array.array.pop
+# List comprehension, regex, RPN even, stacks, queues, SUPER USEFUL search keywords
+
 import re
 import random
 import math
