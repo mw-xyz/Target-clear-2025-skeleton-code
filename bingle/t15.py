@@ -9,47 +9,68 @@ def Main():
     MaxTarget = 0
     MaxNumber = 0
     TrainingGame = False
-    Choice = input("Enter y to play the training game, anything else to play a random game: ").lower()
+    Choice = input("Enter y to play the training game, m to load a game, anything else to play a random game: ").lower()
     print()
     if Choice == "y":
         MaxNumber = 1000
         MaxTarget = 1000
         TrainingGame = True
         Targets = [-1, -1, -1, -1, -1, 23, 9, 140, 82, 121, 34, 45, 68, 75, 34, 23, 119, 43, 23, 119]
+    elif Choice == "m":
+        Targets, NumbersAllowed, Score = RestoreGame()
     else:
         MaxNumber = 10
         MaxTarget = 50
         Targets = CreateTargets(MaxNumberOfTargets, MaxTarget)        
-    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
-    PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber)
+        NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+    PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber, Score)
     input()
-    
-def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
+
+def RestoreGame():
+    Targets = []
+    NumbersAllowed = []
     Score = 0
+    str = input("Enter save game code here: ")
+    while len(str) != 26:
+        print("String must contain 26 characters")
+        str = input("Enter save game code here: ")
+    for char in str[:19]:
+        if char == "@":
+            Targets.append(-1)
+        else:
+            newchar = ord(char)
+            newchar -= 64
+            Targets.append(newchar)
+    for char in str[20:25]:
+        newchar = ord(char)
+        newchar -= 64
+        NumbersAllowed.append(newchar)
+    newchar = ord(str[-1])
+    newchar -= 64
+    Score = newchar
+    print(Targets)
+    print(NumbersAllowed)
+    print(Score)
+    return Targets, NumbersAllowed, Score
+
+def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber, Score):
     GameOver = False
     while not GameOver:
-        idx = None
-        DisplayState(Targets, NumbersAllowed, Score, idx if idx is not None else 9999)
-        f = input("do you want to freeze a number? type y for yes or anything else for no: ").lower()
-        if f == "y":
-            idx = int(input("enter the position of the number you want to freeze (zero index): "))
-            DisplayState(Targets, NumbersAllowed, Score, idx)
+        DisplayState(Targets, NumbersAllowed, Score)
+        UserInput = input("Enter an expression: ")
+        print()
+        if CheckIfUserInputValid(UserInput):
+            UserInputInRPN = ConvertToRPN(UserInput)
+            if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+                if IsTarget:
+                    NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
+                    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+        Score -= 1
+        if Targets[0] != -1:
+            GameOver = True
         else:
-            UserInput = input("Enter an expression: ")
-            print()
-            if CheckIfUserInputValid(UserInput):
-                UserInputInRPN = ConvertToRPN(UserInput)
-                if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
-                    IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
-                    if IsTarget:
-                        NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
-                        NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
-            Score -= 1
-            if Targets[0] != -1:
-                GameOver = True
-            else:
-                Targets = UpdateTargets(Targets, TrainingGame, MaxTarget, idx) 
-               
+            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)        
     print("Game over!")
     DisplayScore(Score)
 
@@ -72,23 +93,15 @@ def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed):
                 NumbersAllowed.remove(int(Item))
     return NumbersAllowed
 
-def UpdateTargets(Targets, TrainingGame, MaxTarget, idx):
-    newList = []
-    x = len(Targets)
-    for i in range (0, x-1):
-        if not idx-1 <= i <= idx + 1:
-            newList.append(Targets[i])
-        elif i == idx-1:
-            second = Targets[i]
-        elif i == idx + 1:
-            first = Targets[i]
-    newList.insert(idx+1, first)
-    newList.insert(idx-1, second)
+def UpdateTargets(Targets, TrainingGame, MaxTarget):
+    for Count in range (0, len(Targets) - 1):
+        Targets[Count] = Targets[Count + 1]
+    Targets.pop()
     if TrainingGame:
         Targets.append(Targets[-1])
     else:
         Targets.append(GetTarget(MaxTarget))
-    return newList
+    return Targets
 
 def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
     Temp = []
@@ -109,8 +122,8 @@ def CheckValidNumber(Item, MaxNumber):
             return True            
     return False
     
-def DisplayState(Targets, NumbersAllowed, Score, idx):
-    DisplayTargets(Targets, idx)
+def DisplayState(Targets, NumbersAllowed, Score):
+    DisplayTargets(Targets)
     DisplayNumbersAllowed(NumbersAllowed)
     DisplayScore(Score)    
 
@@ -126,15 +139,13 @@ def DisplayNumbersAllowed(NumbersAllowed):
     print()
     print()
     
-def DisplayTargets(Targets, idx):
+def DisplayTargets(Targets):
     print("|", end = '')
-    for i in range(0, len(Targets)):
-        if Targets[i] == -1:
+    for T in Targets:
+        if T == -1:
             print(" ", end = '')
-        elif i == idx:
-            print("<",Targets[i],">", end = '')
         else:
-            print(Targets[i], end = '')           
+            print(T, end = '')           
         print("|", end = '')
     print()
     print()
